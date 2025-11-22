@@ -168,8 +168,80 @@
       <!-- Panel: Postać 1 -->
       <div class="section panel" data-idx="1">
         <div class="flex">
+          <!-- LEWA: imię + ciało + statusy -->
           <div class="column">
+            <h2 style="margin-top:0;">Imię postaci</h2>
+            <input type="text" class="character-name" placeholder="Wpisz imię postaci" />
 
+            <div class="section" style="margin-top:12px">
+              <h3>Zdrowie części ciała</h3>
+              <div class="character-image">
+                <img src="assets/images/Final_hp_photo.jpg" alt="Postać" />
+
+                <div class="body-part" id="head">Głowa:
+                  <input type="number" class="hp-cur" value="10" /> /
+                  <input type="number" class="hp-max" value="10" />
+                </div>
+                <div class="body-part" id="torso">Korpus:
+                  <input type="number" class="hp-cur" value="20" /> /
+                  <input type="number" class="hp-max" value="20" />
+                </div>
+                <div class="body-part" id="left-arm">L. Ręka:
+                  <input type="number" class="hp-cur" value="10" /> /
+                  <input type="number" class="hp-max" value="10" />
+                </div>
+                <div class="body-part" id="right-arm">P. Ręka:
+                  <input type="number" class="hp-cur" value="10" /> /
+                  <input type="number" class="hp-max" value="10" />
+                </div>
+                <div class="body-part" id="left-leg">L. Noga:
+                  <input type="number" class="hp-cur" value="10" /> /
+                  <input type="number" class="hp-max" value="10" />
+                </div>
+                <div class="body-part" id="right-leg">P. Noga:
+                  <input type="number" class="hp-cur" value="10" /> /
+                  <input type="number" class="hp-max" value="10" />
+                </div>
+              </div>
+            </div>
+
+            <div class="section status-section" style="margin-top:12px">
+              <h3>Statusy</h3>
+              <div class="status-controls">
+                <label>
+                  Część ciała
+                  <select class="status-part-select">
+                    <option value="head">Głowa</option>
+                    <option value="torso">Korpus</option>
+                    <option value="left-arm">Lewa ręka</option>
+                    <option value="right-arm">Prawa ręka</option>
+                    <option value="left-leg">Lewa noga</option>
+                    <option value="right-leg">Prawa noga</option>
+                  </select>
+                </label>
+                <label>
+                  Status
+                  <select class="status-type-select">
+                    <option value="bleeding">Krwawienie</option>
+                    <option value="fracture">Złamanie</option>
+                    <option value="stun">Ogłuszenie</option>
+                    <option value="burn">Oparzenie</option>
+                    <option value="poison">Trucizna</option>
+                    <option value="custom">Inny (w opisie)</option>
+                  </select>
+                </label>
+                <label>
+                  Opis
+                  <input type="text" class="status-desc-input" placeholder="np. -1 HP/obr." />
+                </label>
+                <button type="button" class="btn secondary add-status-btn">Dodaj status</button>
+              </div>
+              <p class="small">Kliknij ikonę statusu, aby ją usunąć.</p>
+            </div>
+          </div>
+
+          <!-- PRAWA: karta 5e + ekwipunek -->
+          <div class="column">
             <!-- Karta postaci DnD 5e -->
             <div class="section sheet-section" style="margin-top:0">
               <h3>Karta postaci (DnD 5e)</h3>
@@ -229,77 +301,6 @@
               </div>
             </div>
 
-            <h2 style="margin-top:12px;">Imię postaci</h2>
-            <input type="text" class="character-name" placeholder="Wpisz imię postaci" />
-
-            <div class="section" style="margin-top:12px">
-              <h3>Zdrowie części ciała</h3>
-              <div class="character-image">
-                <img src="assets/images/Final_hp_photo.jpg" alt="Postać" />
-
-                <div class="body-part" id="head">Głowa:
-                  <input type="number" class="hp-cur" value="10" /> /
-                  <input type="number" class="hp-max" value="10" />
-                </div>
-                <div class="body-part" id="torso">Korpus:
-                  <input type="number" class="hp-cur" value="20" /> /
-                  <input type="number" class="hp-max" value="20" />
-                </div>
-                <div class="body-part" id="left-arm">L. Ręka:
-                  <input type="number" class="hp-cur" value="10" /> /
-                  <input type="number" class="hp-max" value="10" />
-                </div>
-                <div class="body-part" id="right-arm">P. Ręka:
-                  <input type="number" class="hp-cur" value="10" /> /
-                  <input type="number" class="hp-max" value="10" />
-                </div>
-                <div class="body-part" id="left-leg">L. Noga:
-                  <input type="number" class="hp-cur" value="10" /> /
-                  <input type="number" class="hp-max" value="10" />
-                </div>
-                <div class="body-part" id="right-leg">P. Noga:
-                  <input type="number" class="hp-cur" value="10" /> /
-                  <input type="number" class="hp-max" value="10" />
-                </div>
-              </div>
-            </div>
-			
-            <div class="section status-section" style="margin-top:12px">
-              <h3>Statusy</h3>
-              <div class="status-controls">
-                <label>
-                  Część ciała
-                  <select class="status-part-select">
-                    <option value="head">Głowa</option>
-                    <option value="torso">Korpus</option>
-                    <option value="left-arm">Lewa ręka</option>
-                    <option value="right-arm">Prawa ręka</option>
-                    <option value="left-leg">Lewa noga</option>
-                    <option value="right-leg">Prawa noga</option>
-                  </select>
-                </label>
-                <label>
-                  Status
-                  <select class="status-type-select">
-                    <option value="bleeding">Krwawienie</option>
-                    <option value="fracture">Złamanie</option>
-                    <option value="stun">Ogłuszenie</option>
-                    <option value="burn">Oparzenie</option>
-                    <option value="poison">Trucizna</option>
-                    <option value="custom">Inny (w opisie)</option>
-                  </select>
-                </label>
-                <label>
-                  Opis
-                  <input type="text" class="status-desc-input" placeholder="np. -1 HP/obr." />
-                </label>
-                <button type="button" class="btn secondary add-status-btn">Dodaj status</button>
-              </div>
-              <p class="small">Kliknij ikonę statusu, aby ją usunąć.</p>
-            </div>
-          </div>
-
-          <div class="column">
             <h3>Ekwipunek</h3>
             <div class="section inv-section" style="padding:12px;">
               <div class="small" style="margin-bottom:6px;">
@@ -340,8 +341,80 @@
       <!-- Panel: Postać 2 -->
       <div class="section panel" data-idx="2">
         <div class="flex">
+          <!-- LEWA: imię + ciało + statusy -->
           <div class="column">
+            <h2 style="margin-top:0;">Imię postaci</h2>
+            <input type="text" class="character-name" placeholder="Wpisz imię postaci" />
 
+            <div class="section" style="margin-top:12px">
+              <h3>Zdrowie części ciała</h3>
+              <div class="character-image">
+                <img src="assets/images/Final_hp_photo.jpg" alt="Postać" />
+
+                <div class="body-part" id="head">Głowa:
+                  <input type="number" class="hp-cur" value="10" /> /
+                  <input type="number" class="hp-max" value="10" />
+                </div>
+                <div class="body-part" id="torso">Korpus:
+                  <input type="number" class="hp-cur" value="20" /> /
+                  <input type="number" class="hp-max" value="20" />
+                </div>
+                <div class="body-part" id="left-arm">L. Ręka:
+                  <input type="number" class="hp-cur" value="10" /> /
+                  <input type="number" class="hp-max" value="10" />
+                </div>
+                <div class="body-part" id="right-arm">P. Ręka:
+                  <input type="number" class="hp-cur" value="10" /> /
+                  <input type="number" class="hp-max" value="10" />
+                </div>
+                <div class="body-part" id="left-leg">L. Noga:
+                  <input type="number" class="hp-cur" value="10" /> /
+                  <input type="number" class="hp-max" value="10" />
+                </div>
+                <div class="body-part" id="right-leg">P. Noga:
+                  <input type="number" class="hp-cur" value="10" /> /
+                  <input type="number" class="hp-max" value="10" />
+                </div>
+              </div>
+            </div>
+
+            <div class="section status-section" style="margin-top:12px">
+              <h3>Statusy</h3>
+              <div class="status-controls">
+                <label>
+                  Część ciała
+                  <select class="status-part-select">
+                    <option value="head">Głowa</option>
+                    <option value="torso">Korpus</option>
+                    <option value="left-arm">Lewa ręka</option>
+                    <option value="right-arm">Prawa ręka</option>
+                    <option value="left-leg">Lewa noga</option>
+                    <option value="right-leg">Prawa noga</option>
+                  </select>
+                </label>
+                <label>
+                  Status
+                  <select class="status-type-select">
+                    <option value="bleeding">Krwawienie</option>
+                    <option value="fracture">Złamanie</option>
+                    <option value="stun">Ogłuszenie</option>
+                    <option value="burn">Oparzenie</option>
+                    <option value="poison">Trucizna</option>
+                    <option value="custom">Inny (w opisie)</option>
+                  </select>
+                </label>
+                <label>
+                  Opis
+                  <input type="text" class="status-desc-input" placeholder="np. -1 HP/obr." />
+                </label>
+                <button type="button" class="btn secondary add-status-btn">Dodaj status</button>
+              </div>
+              <p class="small">Kliknij ikonę statusu, aby ją usunąć.</p>
+            </div>
+          </div>
+
+          <!-- PRAWA: karta 5e + ekwipunek -->
+          <div class="column">
             <!-- Karta postaci DnD 5e -->
             <div class="section sheet-section" style="margin-top:0">
               <h3>Karta postaci (DnD 5e)</h3>
@@ -401,77 +474,6 @@
               </div>
             </div>
 
-            <h2 style="margin-top:12px;">Imię postaci</h2>
-            <input type="text" class="character-name" placeholder="Wpisz imię postaci" />
-
-            <div class="section" style="margin-top:12px">
-              <h3>Zdrowie części ciała</h3>
-              <div class="character-image">
-                <img src="assets/images/Final_hp_photo.jpg" alt="Postać" />
-
-                <div class="body-part" id="head">Głowa:
-                  <input type="number" class="hp-cur" value="10" /> /
-                  <input type="number" class="hp-max" value="10" />
-                </div>
-                <div class="body-part" id="torso">Korpus:
-                  <input type="number" class="hp-cur" value="20" /> /
-                  <input type="number" class="hp-max" value="20" />
-                </div>
-                <div class="body-part" id="left-arm">L. Ręka:
-                  <input type="number" class="hp-cur" value="10" /> /
-                  <input type="number" class="hp-max" value="10" />
-                </div>
-                <div class="body-part" id="right-arm">P. Ręka:
-                  <input type="number" class="hp-cur" value="10" /> /
-                  <input type="number" class="hp-max" value="10" />
-                </div>
-                <div class="body-part" id="left-leg">L. Noga:
-                  <input type="number" class="hp-cur" value="10" /> /
-                  <input type="number" class="hp-max" value="10" />
-                </div>
-                <div class="body-part" id="right-leg">P. Noga:
-                  <input type="number" class="hp-cur" value="10" /> /
-                  <input type="number" class="hp-max" value="10" />
-                </div>
-              </div>
-            </div>
-
-            <div class="section status-section" style="margin-top:12px">
-              <h3>Statusy</h3>
-              <div class="status-controls">
-                <label>
-                  Część ciała
-                  <select class="status-part-select">
-                    <option value="head">Głowa</option>
-                    <option value="torso">Korpus</option>
-                    <option value="left-arm">Lewa ręka</option>
-                    <option value="right-arm">Prawa ręka</option>
-                    <option value="left-leg">Lewa noga</option>
-                    <option value="right-leg">Prawa noga</option>
-                  </select>
-                </label>
-                <label>
-                  Status
-                  <select class="status-type-select">
-                    <option value="bleeding">Krwawienie</option>
-                    <option value="fracture">Złamanie</option>
-                    <option value="stun">Ogłuszenie</option>
-                    <option value="burn">Oparzenie</option>
-                    <option value="poison">Trucizna</option>
-                    <option value="custom">Inny (w opisie)</option>
-                  </select>
-                </label>
-                <label>
-                  Opis
-                  <input type="text" class="status-desc-input" placeholder="np. -1 HP/obr." />
-                </label>
-                <button type="button" class="btn secondary add-status-btn">Dodaj status</button>
-              </div>
-              <p class="small">Kliknij ikonę statusu, aby ją usunąć.</p>
-            </div>
-          </div>
-
-          <div class="column">
             <h3>Ekwipunek</h3>
             <div class="section inv-section" style="padding:12px;">
               <div class="small" style="margin-bottom:6px;">
@@ -600,8 +602,6 @@
         }
       });
     })();
-
-    // --- helpers: ekwipunek / statusy ---
 
     function createStatusIcon(type, desc){
       const iconEl = document.createElement('span');

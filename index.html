@@ -27,7 +27,6 @@
     #left-leg{top:74%;left:10%}
     #right-leg{top:74%;left:54%}
     input[type="number"]{width:64px}
-    .inventory-item{display:block;margin-bottom:8px}
     .mg-panel{background:#232323;padding:12px;border-radius:10px}
     .small{font-size:13px;color:var(--muted)}
     .btn{padding:8px 12px;border-radius:8px;background:#4a90e2;color:#fff;border:none;cursor:pointer}
@@ -38,6 +37,90 @@
     .badge{padding:4px 8px;border-radius:999px;font-size:12px;background:#333}
     .badge.online{background:#2e7d32}
     .badge.offline{background:#b71c1c}
+
+    /* Statusy */
+    .status-controls {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:flex-end;
+      margin-top:8px;
+    }
+    .status-controls label {
+      display:flex;
+      flex-direction:column;
+      font-size:13px;
+    }
+    .status-controls select,
+    .status-controls input[type="text"] {
+      padding:4px 6px;
+      border-radius:6px;
+      border:1px solid #555;
+      background:#181818;
+      color:#f0f0f0;
+      font-size:13px;
+    }
+    .status-icon {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      font-size:12px;
+      margin-left:4px;
+      cursor:pointer;
+      background:rgba(0,0,0,0.55);
+      border:1px solid rgba(255,255,255,0.4);
+    }
+    .status-icon:hover {
+      transform:scale(1.1);
+    }
+
+    /* Ekwipunek – tabela */
+    .inv-table {
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+    }
+    .inv-table th,
+    .inv-table td {
+      border-bottom:1px solid #444;
+      padding:3px 4px;
+    }
+    .inv-table th {
+      text-align:left;
+      font-weight:600;
+    }
+    .inv-table input[type="text"],
+    .inv-table input[type="number"] {
+      width:100%;
+      box-sizing:border-box;
+      padding:2px 4px;
+      border-radius:4px;
+      border:1px solid #555;
+      background:#111;
+      color:#f0f0f0;
+      font-size:12px;
+    }
+    .inv-section .btn {
+      margin-top:8px;
+    }
+
+    /* Karta postaci – inputs */
+    .sheet-section label input[type="text"],
+    .sheet-section label input[type="number"] {
+      padding:4px 6px;
+      border-radius:6px;
+      border:1px solid #555;
+      background:#181818;
+      color:#f0f0f0;
+      font-size:13px;
+      min-width:80px;
+    }
+    .sheet-section .sheet-ability {
+      width:60px;
+    }
   </style>
 </head>
 <body>
@@ -86,7 +169,67 @@
       <div class="section panel" data-idx="1">
         <div class="flex">
           <div class="column">
-            <h2>Imię postaci</h2>
+
+            <!-- Karta postaci DnD 5e -->
+            <div class="section sheet-section" style="margin-top:0">
+              <h3>Karta postaci (DnD 5e)</h3>
+              <div class="small">Podstawowe informacje – edytowalne przez gracza.</div>
+
+              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Klasa i poziom
+                  <input type="text" class="sheet-classlevel" placeholder="np. Fighter 3" />
+                </label>
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Rasa
+                  <input type="text" class="sheet-race" />
+                </label>
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Tło
+                  <input type="text" class="sheet-background" />
+                </label>
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Imię gracza
+                  <input type="text" class="sheet-playername" />
+                </label>
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Światopogląd
+                  <input type="text" class="sheet-alignment" placeholder="np. NG" />
+                </label>
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Doświadczenie
+                  <input type="number" class="sheet-xp" min="0" />
+                </label>
+              </div>
+
+              <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:12px;">
+                <div>
+                  <div class="small">Atrybuty</div>
+                  <div style="display:grid; grid-template-columns:repeat(3, minmax(60px,80px)); gap:4px; margin-top:4px;">
+                    <label class="small">STR <input type="number" class="sheet-ability" data-ability="str" /></label>
+                    <label class="small">DEX <input type="number" class="sheet-ability" data-ability="dex" /></label>
+                    <label class="small">CON <input type="number" class="sheet-ability" data-ability="con" /></label>
+                    <label class="small">INT <input type="number" class="sheet-ability" data-ability="int" /></label>
+                    <label class="small">WIS <input type="number" class="sheet-ability" data-ability="wis" /></label>
+                    <label class="small">CHA <input type="number" class="sheet-ability" data-ability="cha" /></label>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="small">Statystyki bojowe</div>
+                  <div style="display:grid; grid-template-columns:repeat(2, minmax(80px,100px)); gap:4px; margin-top:4px;">
+                    <label class="small">AC <input type="number" class="sheet-ac" /></label>
+                    <label class="small">Inicjatywa <input type="number" class="sheet-init" /></label>
+                    <label class="small">Prędkość <input type="text" class="sheet-speed" placeholder="np. 9 m" /></label>
+                    <label class="small">Biegłość <input type="number" class="sheet-prof" /></label>
+                    <label class="small">HP max <input type="number" class="sheet-hpmax" /></label>
+                    <label class="small">Passive Perception <input type="number" class="sheet-passive-perc" /></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h2 style="margin-top:12px;">Imię postaci</h2>
             <input type="text" class="character-name" placeholder="Wpisz imię postaci" />
 
             <div class="section" style="margin-top:12px">
@@ -121,7 +264,7 @@
               </div>
             </div>
 			
-			<div class="section status-section" style="margin-top:12px">
+            <div class="section status-section" style="margin-top:12px">
               <h3>Statusy</h3>
               <div class="status-controls">
                 <label>
@@ -158,11 +301,28 @@
 
           <div class="column">
             <h3>Ekwipunek</h3>
-            <div>
-              <label class="inventory-item">Broń: <input type="text" class="inv" placeholder="np. Miecz" /></label>
-              <label class="inventory-item">Zbroja: <input type="text" class="inv" placeholder="np. Skórzana Zbroja" /></label>
-              <label class="inventory-item">Przedmiot 1: <input type="text" class="inv" /></label>
-              <label class="inventory-item">Przedmiot 2: <input type="text" class="inv" /></label>
+            <div class="section inv-section" style="padding:12px;">
+              <div class="small" style="margin-bottom:6px;">
+                Dodawaj przedmioty, zaznaczaj co jest aktualnie wyposażone. Wszystko synchronizuje się online.
+              </div>
+
+              <table class="inv-table">
+                <thead>
+                  <tr>
+                    <th>Nazwa</th>
+                    <th>Typ</th>
+                    <th>Ilość</th>
+                    <th>Notatki</th>
+                    <th style="text-align:center;">Wyposażone</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody class="inv-body">
+                  <!-- wiersze dodaje JS -->
+                </tbody>
+              </table>
+
+              <button type="button" class="btn secondary add-item-btn">Dodaj przedmiot</button>
             </div>
 
             <div style="margin-top:18px">
@@ -181,7 +341,67 @@
       <div class="section panel" data-idx="2">
         <div class="flex">
           <div class="column">
-            <h2>Imię postaci</h2>
+
+            <!-- Karta postaci DnD 5e -->
+            <div class="section sheet-section" style="margin-top:0">
+              <h3>Karta postaci (DnD 5e)</h3>
+              <div class="small">Podstawowe informacje – edytowalne przez gracza.</div>
+
+              <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Klasa i poziom
+                  <input type="text" class="sheet-classlevel" placeholder="np. Rogue 2" />
+                </label>
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Rasa
+                  <input type="text" class="sheet-race" />
+                </label>
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Tło
+                  <input type="text" class="sheet-background" />
+                </label>
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Imię gracza
+                  <input type="text" class="sheet-playername" />
+                </label>
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Światopogląd
+                  <input type="text" class="sheet-alignment" placeholder="np. CN" />
+                </label>
+                <label class="small" style="display:flex;flex-direction:column;">
+                  Doświadczenie
+                  <input type="number" class="sheet-xp" min="0" />
+                </label>
+              </div>
+
+              <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:12px;">
+                <div>
+                  <div class="small">Atrybuty</div>
+                  <div style="display:grid; grid-template-columns:repeat(3, minmax(60px,80px)); gap:4px; margin-top:4px;">
+                    <label class="small">STR <input type="number" class="sheet-ability" data-ability="str" /></label>
+                    <label class="small">DEX <input type="number" class="sheet-ability" data-ability="dex" /></label>
+                    <label class="small">CON <input type="number" class="sheet-ability" data-ability="con" /></label>
+                    <label class="small">INT <input type="number" class="sheet-ability" data-ability="int" /></label>
+                    <label class="small">WIS <input type="number" class="sheet-ability" data-ability="wis" /></label>
+                    <label class="small">CHA <input type="number" class="sheet-ability" data-ability="cha" /></label>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="small">Statystyki bojowe</div>
+                  <div style="display:grid; grid-template-columns:repeat(2, minmax(80px,100px)); gap:4px; margin-top:4px;">
+                    <label class="small">AC <input type="number" class="sheet-ac" /></label>
+                    <label class="small">Inicjatywa <input type="number" class="sheet-init" /></label>
+                    <label class="small">Prędkość <input type="text" class="sheet-speed" placeholder="np. 9 m" /></label>
+                    <label class="small">Biegłość <input type="number" class="sheet-prof" /></label>
+                    <label class="small">HP max <input type="number" class="sheet-hpmax" /></label>
+                    <label class="small">Passive Perception <input type="number" class="sheet-passive-perc" /></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h2 style="margin-top:12px;">Imię postaci</h2>
             <input type="text" class="character-name" placeholder="Wpisz imię postaci" />
 
             <div class="section" style="margin-top:12px">
@@ -215,7 +435,8 @@
                 </div>
               </div>
             </div>
-			 <div class="section status-section" style="margin-top:12px">
+
+            <div class="section status-section" style="margin-top:12px">
               <h3>Statusy</h3>
               <div class="status-controls">
                 <label>
@@ -252,11 +473,28 @@
 
           <div class="column">
             <h3>Ekwipunek</h3>
-            <div>
-              <label class="inventory-item">Broń: <input type="text" class="inv" placeholder="np. Miecz" /></label>
-              <label class="inventory-item">Zbroja: <input type="text" class="inv" placeholder="np. Skórzana Zbroja" /></label>
-              <label class="inventory-item">Przedmiot 1: <input type="text" class="inv" /></label>
-              <label class="inventory-item">Przedmiot 2: <input type="text" class="inv" /></label>
+            <div class="section inv-section" style="padding:12px;">
+              <div class="small" style="margin-bottom:6px;">
+                Dodawaj przedmioty, zaznaczaj co jest aktualnie wyposażone. Wszystko synchronizuje się online.
+              </div>
+
+              <table class="inv-table">
+                <thead>
+                  <tr>
+                    <th>Nazwa</th>
+                    <th>Typ</th>
+                    <th>Ilość</th>
+                    <th>Notatki</th>
+                    <th style="text-align:center;">Wyposażone</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody class="inv-body">
+                  <!-- wiersze dodaje JS -->
+                </tbody>
+              </table>
+
+              <button type="button" class="btn secondary add-item-btn">Dodaj przedmiot</button>
             </div>
 
             <div style="margin-top:18px">
@@ -363,73 +601,9 @@
       });
     })();
 
-    // --- Zbieranie i aplikowanie stanu postaci ---
+    // --- helpers: ekwipunek / statusy ---
 
-    function collectStateFromPanel(panel){
-      const state = { name: '', parts:{}, inventory:[], statuses:{} };
-      const nameEl = panel.querySelector('.character-name');
-      state.name = nameEl ? nameEl.value : '';
-
-      ['head','torso','left-arm','right-arm','left-leg','right-leg'].forEach(id=>{
-        const el = panel.querySelector('.body-part#'+id);
-        if(!el) return;
-        const cur = el.querySelector('.hp-cur').value;
-        const max = el.querySelector('.hp-max').value;
-        state.parts[id] = [cur,max];
-
-        // statusy dla tej części
-        state.statuses[id] = [];
-        el.querySelectorAll('.status-icon').forEach(icon=>{
-          state.statuses[id].push({
-            type: icon.dataset.type || 'custom',
-            desc: icon.dataset.desc || ''
-          });
-        });
-      });
-
-      panel.querySelectorAll('.inv').forEach(i=> state.inventory.push(i.value));
-      return state;
-    }
-
-	function applyStateToPanel(panel, state){
-      if(!state) return;
-      const nameEl = panel.querySelector('.character-name');
-      if (nameEl) nameEl.value = state.name || '';
-
-      // HP
-      Object.entries(state.parts || {}).forEach(([id,vals])=>{
-        const el = panel.querySelector('.body-part#'+id);
-        if(!el) return;
-        const curEl = el.querySelector('.hp-cur');
-        const maxEl = el.querySelector('.hp-max');
-        if (curEl) curEl.value = vals[0];
-        if (maxEl) maxEl.value = vals[1];
-      });
-
-      // Ekwipunek
-      panel.querySelectorAll('.inv').forEach((i,idx)=>{
-        if (state.inventory && state.inventory[idx] !== undefined) {
-          i.value = state.inventory[idx];
-        } else {
-          i.value = '';
-        }
-      });
-
-      // Statusy – najpierw czyścimy stare ikonki
-      ['head','torso','left-arm','right-arm','left-leg','right-leg'].forEach(id=>{
-        const el = panel.querySelector('.body-part#'+id);
-        if(!el) return;
-        el.querySelectorAll('.status-icon').forEach(icon=> icon.remove());
-
-        if (!state.statuses || !state.statuses[id]) return;
-        state.statuses[id].forEach(st => {
-          const iconEl = createStatusIcon(st.type, st.desc);
-          el.appendChild(iconEl);
-        });
-      });
-    }
-
-	function createStatusIcon(type, desc){
+    function createStatusIcon(type, desc){
       const iconEl = document.createElement('span');
       iconEl.className = 'status-icon';
       iconEl.dataset.type = type || 'custom';
@@ -450,6 +624,153 @@
       return iconEl;
     }
 
+    function createInventoryRow(item) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" class="inv-name" value="${item.name || ''}" /></td>
+        <td><input type="text" class="inv-type" value="${item.type || ''}" /></td>
+        <td><input type="number" class="inv-qty" min="0" value="${item.qty != null ? item.qty : 1}" /></td>
+        <td><input type="text" class="inv-notes" value="${item.notes || ''}" /></td>
+        <td style="text-align:center;">
+          <input type="checkbox" class="inv-equipped" ${item.equipped ? 'checked' : ''} />
+        </td>
+        <td style="text-align:center;">
+          <button type="button" class="btn secondary inv-del-btn" style="padding:2px 6px; font-size:11px;">X</button>
+        </td>
+      `;
+      return tr;
+    }
+
+    // --- Zbieranie i aplikowanie stanu postaci ---
+
+    function collectStateFromPanel(panel){
+      const state = { name: '', parts:{}, inventory:[], statuses:{}, sheet:{} };
+      const nameEl = panel.querySelector('.character-name');
+      state.name = nameEl ? nameEl.value : '';
+
+      // HP + statusy
+      ['head','torso','left-arm','right-arm','left-leg','right-leg'].forEach(id=>{
+        const el = panel.querySelector('.body-part#'+id);
+        if(!el) return;
+        const cur = el.querySelector('.hp-cur').value;
+        const max = el.querySelector('.hp-max').value;
+        state.parts[id] = [cur,max];
+
+        // statusy dla tej części
+        state.statuses[id] = [];
+        el.querySelectorAll('.status-icon').forEach(icon=>{
+          state.statuses[id].push({
+            type: icon.dataset.type || 'custom',
+            desc: icon.dataset.desc || ''
+          });
+        });
+      });
+
+      // Ekwipunek – tabela
+      state.inventory = [];
+      const tbody = panel.querySelector('.inv-body');
+      if (tbody) {
+        tbody.querySelectorAll('tr').forEach(tr => {
+          state.inventory.push({
+            name:  tr.querySelector('.inv-name')?.value || '',
+            type:  tr.querySelector('.inv-type')?.value || '',
+            qty:   parseInt(tr.querySelector('.inv-qty')?.value || '0') || 0,
+            notes: tr.querySelector('.inv-notes')?.value || '',
+            equipped: tr.querySelector('.inv-equipped')?.checked || false
+          });
+        });
+      }
+
+      // Karta postaci (sheet)
+      state.sheet = {
+        classLevel: panel.querySelector('.sheet-classlevel')?.value || '',
+        race:       panel.querySelector('.sheet-race')?.value || '',
+        background: panel.querySelector('.sheet-background')?.value || '',
+        playerName: panel.querySelector('.sheet-playername')?.value || '',
+        alignment:  panel.querySelector('.sheet-alignment')?.value || '',
+        xp:         parseInt(panel.querySelector('.sheet-xp')?.value || '0') || 0,
+        abilities: {},
+        ac:         parseInt(panel.querySelector('.sheet-ac')?.value || '0') || 0,
+        init:       parseInt(panel.querySelector('.sheet-init')?.value || '0') || 0,
+        speed:      panel.querySelector('.sheet-speed')?.value || '',
+        profBonus:  parseInt(panel.querySelector('.sheet-prof')?.value || '0') || 0,
+        hpMax:      parseInt(panel.querySelector('.sheet-hpmax')?.value || '0') || 0,
+        passivePerc:parseInt(panel.querySelector('.sheet-passive-perc')?.value || '0') || 0
+      };
+
+      panel.querySelectorAll('.sheet-ability').forEach(inp => {
+        const key = inp.dataset.ability;
+        if (!key) return;
+        state.sheet.abilities[key] = parseInt(inp.value || '0') || 0;
+      });
+
+      return state;
+    }
+
+    function applyStateToPanel(panel, state){
+      if(!state) return;
+      const nameEl = panel.querySelector('.character-name');
+      if (nameEl) nameEl.value = state.name || '';
+
+      // HP
+      Object.entries(state.parts || {}).forEach(([id,vals])=>{
+        const el = panel.querySelector('.body-part#'+id);
+        if(!el) return;
+        const curEl = el.querySelector('.hp-cur');
+        const maxEl = el.querySelector('.hp-max');
+        if (curEl) curEl.value = vals[0];
+        if (maxEl) maxEl.value = vals[1];
+      });
+
+      // Ekwipunek – odtwarzanie tabeli
+      const tbody = panel.querySelector('.inv-body');
+      if (tbody) {
+        tbody.innerHTML = '';
+        (state.inventory || []).forEach(item => {
+          const row = createInventoryRow(item);
+          tbody.appendChild(row);
+        });
+      }
+
+      // Statusy – najpierw czyścimy stare ikonki
+      ['head','torso','left-arm','right-arm','left-leg','right-leg'].forEach(id=>{
+        const el = panel.querySelector('.body-part#'+id);
+        if(!el) return;
+        el.querySelectorAll('.status-icon').forEach(icon=> icon.remove());
+
+        if (!state.statuses || !state.statuses[id]) return;
+        state.statuses[id].forEach(st => {
+          const iconEl = createStatusIcon(st.type, st.desc);
+          el.appendChild(iconEl);
+        });
+      });
+
+      // Karta postaci (sheet)
+      if (state.sheet) {
+        const sh = state.sheet;
+        panel.querySelector('.sheet-classlevel')  && (panel.querySelector('.sheet-classlevel').value  = sh.classLevel || '');
+        panel.querySelector('.sheet-race')        && (panel.querySelector('.sheet-race').value        = sh.race || '');
+        panel.querySelector('.sheet-background')  && (panel.querySelector('.sheet-background').value  = sh.background || '');
+        panel.querySelector('.sheet-playername')  && (panel.querySelector('.sheet-playername').value  = sh.playerName || '');
+        panel.querySelector('.sheet-alignment')   && (panel.querySelector('.sheet-alignment').value   = sh.alignment || '');
+        panel.querySelector('.sheet-xp')          && (panel.querySelector('.sheet-xp').value          = sh.xp ?? 0);
+        panel.querySelector('.sheet-ac')          && (panel.querySelector('.sheet-ac').value          = sh.ac ?? 0);
+        panel.querySelector('.sheet-init')        && (panel.querySelector('.sheet-init').value        = sh.init ?? 0);
+        panel.querySelector('.sheet-speed')       && (panel.querySelector('.sheet-speed').value       = sh.speed || '');
+        panel.querySelector('.sheet-prof')        && (panel.querySelector('.sheet-prof').value        = sh.profBonus ?? 0);
+        panel.querySelector('.sheet-hpmax')       && (panel.querySelector('.sheet-hpmax').value       = sh.hpMax ?? 0);
+        panel.querySelector('.sheet-passive-perc')&& (panel.querySelector('.sheet-passive-perc').value= sh.passivePerc ?? 0);
+
+        if (sh.abilities) {
+          panel.querySelectorAll('.sheet-ability').forEach(inp => {
+            const key = inp.dataset.ability;
+            if (!key) return;
+            inp.value = sh.abilities[key] ?? 0;
+          });
+        }
+      }
+    }
+
     function saveStateFor(idx, options){
       options = options || {};
       const panel = document.querySelector('.panel[data-idx="'+idx+'"]');
@@ -463,12 +784,12 @@
       }
     }
 
-	 function saveStateWithRole(idx){
+    function saveStateWithRole(idx){
       if(currentRole === 'gm'){
         saveStateFor(idx, {push:true});
       } else if(currentRole === 'player'){
-        // na razie gracz nie pcha statusów do Firebase – tylko lokalnie
-        saveStateFor(idx, {push:false});
+        // gracz pcha tylko to, na co pozwoli MG (HP/ekwipunek/sheet)
+        saveStateFor(idx, {push:true});
       } else {
         saveStateFor(idx, {push:false});
       }
@@ -618,10 +939,9 @@
         nameEl.style.display = v.showName ? 'block' : 'none';
       }
 
-      // Ekwipunek
-      panel.querySelectorAll('.inv').forEach(i=>{
-        const wrapper = i.closest('.inventory-item');
-        if(wrapper) wrapper.style.display = v.showInventory ? 'block' : 'none';
+      // Ekwipunek (cała sekcja)
+      panel.querySelectorAll('.inv-section').forEach(sec=>{
+        sec.style.display = v.showInventory ? 'block' : 'none';
       });
 
       // HP (same cyferki, label zostaje)
@@ -636,10 +956,25 @@
         const playerIdx = currentPlayerIdx || '1';
         if(panel.dataset.idx !== playerIdx) return;
         panel.querySelectorAll('.hp-cur, .hp-max').forEach(i=> i.readOnly = !v.allowPlayerEditHP);
-        panel.querySelectorAll('.inv').forEach(i=> i.readOnly = !v.allowPlayerEditInv);
+
+        const invInputs = panel.querySelectorAll('.inv-name, .inv-type, .inv-qty, .inv-notes, .inv-equipped');
+        invInputs.forEach(i => {
+          if (i.type === 'checkbox') {
+            i.disabled = !v.allowPlayerEditInv;
+          } else {
+            i.readOnly = !v.allowPlayerEditInv;
+          }
+        });
       } else {
         panel.querySelectorAll('.hp-cur, .hp-max').forEach(i=> i.readOnly = false);
-        panel.querySelectorAll('.inv').forEach(i=> i.readOnly = false);
+        const invInputs = panel.querySelectorAll('.inv-name, .inv-type, .inv-qty, .inv-notes, .inv-equipped');
+        invInputs.forEach(i => {
+          if (i.type === 'checkbox') {
+            i.disabled = false;
+          } else {
+            i.readOnly = false;
+          }
+        });
       }
     }
 
@@ -647,13 +982,15 @@
       panels.forEach(panel => applyVisibilityToPanel(panel));
     }
 
-    // --- Zdarzenia ---
+    // --- Zdarzenia globalne ---
 
     // input -> zapis / sync
     document.addEventListener('input', e=>{
       const panel = e.target.closest('.panel');
       if(!panel) return;
       const idx = panel.dataset.idx;
+
+      // HP kolory
       updateColorsFor(panel);
 
       if(isApplyingFromServer) return; // nie echo’ujemy zmian z Firebase
@@ -661,20 +998,55 @@
       const role = currentRole;
       const v = visibility;
       const isHpInput = e.target.classList.contains('hp-cur') || e.target.classList.contains('hp-max');
-      const isInvInput = e.target.classList.contains('inv');
+      const isInvField = e.target.closest('.inv-table') !== null;
+      const isSheetField = e.target.classList.contains('sheet-classlevel')
+                        || e.target.classList.contains('sheet-race')
+                        || e.target.classList.contains('sheet-background')
+                        || e.target.classList.contains('sheet-playername')
+                        || e.target.classList.contains('sheet-alignment')
+                        || e.target.classList.contains('sheet-xp')
+                        || e.target.classList.contains('sheet-ac')
+                        || e.target.classList.contains('sheet-init')
+                        || e.target.classList.contains('sheet-speed')
+                        || e.target.classList.contains('sheet-prof')
+                        || e.target.classList.contains('sheet-hpmax')
+                        || e.target.classList.contains('sheet-passive-perc')
+                        || e.target.classList.contains('sheet-ability');
+
+      let canPush = false;
 
       if(role === 'gm'){
-        // MG zawsze pcha do Firebase
-        saveStateFor(idx, {push:true});
+        canPush = true; // MG może wszystko
       } else if(role === 'player'){
-        let canPush = false;
-        if(isHpInput && v.allowPlayerEditHP) canPush = true;
-        if(isInvInput && v.allowPlayerEditInv) canPush = true;
-        saveStateFor(idx, {push:canPush});
+        if (isSheetField) canPush = true; // karta postaci edytowalna przez gracza
+        if (isHpInput && v.allowPlayerEditHP) canPush = true;
+        if (isInvField && v.allowPlayerEditInv) canPush = true;
       } else {
-        // Nie wybrano roli – tylko lokalny zapis
-        saveStateFor(idx, {push:false});
+        canPush = false;
       }
+
+      saveStateFor(idx, {push:canPush});
+    });
+
+    // Dodawanie/usuwanie przedmiotów
+    document.querySelectorAll('.add-item-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panel = btn.closest('.panel');
+        const idx = panel.dataset.idx;
+        const tbody = panel.querySelector('.inv-body');
+        const row = createInventoryRow({ name:'', type:'', qty:1, notes:'', equipped:false });
+        tbody.appendChild(row);
+        saveStateWithRole(idx);
+      });
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.classList.contains('inv-del-btn')) return;
+      const panel = e.target.closest('.panel');
+      if (!panel) return;
+      const idx = panel.dataset.idx;
+      e.target.closest('tr').remove();
+      saveStateWithRole(idx);
     });
 
     // Eksport / import JSON
@@ -723,6 +1095,31 @@
         visibility.allowPlayerEditInv = $('#allow_player_edit_inv').checked;
         pushVisibilityToServer();
         applyVisibilityToAll();
+      });
+    });
+
+    // Obsługa dodawania statusów
+    document.querySelectorAll('.add-status-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panel = btn.closest('.panel');
+        const idx = panel.dataset.idx;
+
+        const partSelect = panel.querySelector('.status-part-select');
+        const typeSelect = panel.querySelector('.status-type-select');
+        const descInput = panel.querySelector('.status-desc-input');
+
+        const partId = partSelect.value;
+        const type = typeSelect.value;
+        const desc = descInput.value.trim();
+
+        const bodyPartEl = panel.querySelector('.body-part#'+partId);
+        if(!bodyPartEl) return;
+
+        const iconEl = createStatusIcon(type, desc);
+        bodyPartEl.appendChild(iconEl);
+
+        descInput.value = '';
+        saveStateWithRole(idx);
       });
     });
 
@@ -783,32 +1180,6 @@
       }
 
       applyVisibilityToAll();
-	  
-	   // Obsługa dodawania statusów
-	document.querySelectorAll('.add-status-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const panel = btn.closest('.panel');
-        const idx = panel.dataset.idx;
-
-        const partSelect = panel.querySelector('.status-part-select');
-        const typeSelect = panel.querySelector('.status-type-select');
-        const descInput = panel.querySelector('.status-desc-input');
-
-        const partId = partSelect.value;
-        const type = typeSelect.value;
-        const desc = descInput.value.trim();
-
-        const bodyPartEl = panel.querySelector('.body-part#'+partId);
-        if(!bodyPartEl) return;
-
-        const iconEl = createStatusIcon(type, desc);
-        bodyPartEl.appendChild(iconEl);
-
-        descInput.value = '';
-        saveStateWithRole(idx);
-      });
-    });
-	  
     })();
 
     // debug
@@ -816,6 +1187,3 @@
   </script>
 </body>
 </html>
-
-
-

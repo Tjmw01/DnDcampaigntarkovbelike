@@ -120,7 +120,40 @@
                 </div>
               </div>
             </div>
-
+			
+			<div class="section status-section" style="margin-top:12px">
+              <h3>Statusy</h3>
+              <div class="status-controls">
+                <label>
+                  Część ciała
+                  <select class="status-part-select">
+                    <option value="head">Głowa</option>
+                    <option value="torso">Korpus</option>
+                    <option value="left-arm">Lewa ręka</option>
+                    <option value="right-arm">Prawa ręka</option>
+                    <option value="left-leg">Lewa noga</option>
+                    <option value="right-leg">Prawa noga</option>
+                  </select>
+                </label>
+                <label>
+                  Status
+                  <select class="status-type-select">
+                    <option value="bleeding">Krwawienie</option>
+                    <option value="fracture">Złamanie</option>
+                    <option value="stun">Ogłuszenie</option>
+                    <option value="burn">Oparzenie</option>
+                    <option value="poison">Trucizna</option>
+                    <option value="custom">Inny (w opisie)</option>
+                  </select>
+                </label>
+                <label>
+                  Opis
+                  <input type="text" class="status-desc-input" placeholder="np. -1 HP/obr." />
+                </label>
+                <button type="button" class="btn secondary add-status-btn">Dodaj status</button>
+              </div>
+              <p class="small">Kliknij ikonę statusu, aby ją usunąć.</p>
+            </div>
           </div>
 
           <div class="column">
@@ -182,7 +215,39 @@
                 </div>
               </div>
             </div>
-
+			 <div class="section status-section" style="margin-top:12px">
+              <h3>Statusy</h3>
+              <div class="status-controls">
+                <label>
+                  Część ciała
+                  <select class="status-part-select">
+                    <option value="head">Głowa</option>
+                    <option value="torso">Korpus</option>
+                    <option value="left-arm">Lewa ręka</option>
+                    <option value="right-arm">Prawa ręka</option>
+                    <option value="left-leg">Lewa noga</option>
+                    <option value="right-leg">Prawa noga</option>
+                  </select>
+                </label>
+                <label>
+                  Status
+                  <select class="status-type-select">
+                    <option value="bleeding">Krwawienie</option>
+                    <option value="fracture">Złamanie</option>
+                    <option value="stun">Ogłuszenie</option>
+                    <option value="burn">Oparzenie</option>
+                    <option value="poison">Trucizna</option>
+                    <option value="custom">Inny (w opisie)</option>
+                  </select>
+                </label>
+                <label>
+                  Opis
+                  <input type="text" class="status-desc-input" placeholder="np. -1 HP/obr." />
+                </label>
+                <button type="button" class="btn secondary add-status-btn">Dodaj status</button>
+              </div>
+              <p class="small">Kliknij ikonę statusu, aby ją usunąć.</p>
+            </div>
           </div>
 
           <div class="column">
@@ -235,6 +300,25 @@
     const db = firebase.database();
     const gameId = "kampania_1"; // jeśli chcesz kolejną kampanię, zmień to np. na "kampania_2"
 
+    // Ikony i nazwy statusów
+    const STATUS_ICON = {
+      bleeding: "🩸",
+      fracture: "🦴",
+      stun: "💫",
+      burn: "🔥",
+      poison: "☠️",
+      custom: "⚠️"
+    };
+
+    const STATUS_LABEL = {
+      bleeding: "Krwawienie",
+      fracture: "Złamanie",
+      stun: "Ogłuszenie",
+      burn: "Oparzenie",
+      poison: "Trucizna",
+      custom: "Status"
+    };
+
     const $ = s => document.querySelector(s);
     const $$ = s => Array.from(document.querySelectorAll(s));
 
@@ -282,7 +366,7 @@
     // --- Zbieranie i aplikowanie stanu postaci ---
 
     function collectStateFromPanel(panel){
-      const state = { name: '', parts:{}, inventory:[] };
+      const state = { name: '', parts:{}, inventory:[], statuses:{} };
       const nameEl = panel.querySelector('.character-name');
       state.name = nameEl ? nameEl.value : '';
 
@@ -291,18 +375,28 @@
         if(!el) return;
         const cur = el.querySelector('.hp-cur').value;
         const max = el.querySelector('.hp-max').value;
-        state.parts[id]=[cur,max];
+        state.parts[id] = [cur,max];
+
+        // statusy dla tej części
+        state.statuses[id] = [];
+        el.querySelectorAll('.status-icon').forEach(icon=>{
+          state.statuses[id].push({
+            type: icon.dataset.type || 'custom',
+            desc: icon.dataset.desc || ''
+          });
+        });
       });
 
       panel.querySelectorAll('.inv').forEach(i=> state.inventory.push(i.value));
       return state;
     }
 
-    function applyStateToPanel(panel, state){
+	function applyStateToPanel(panel, state){
       if(!state) return;
       const nameEl = panel.querySelector('.character-name');
       if (nameEl) nameEl.value = state.name || '';
 
+      // HP
       Object.entries(state.parts || {}).forEach(([id,vals])=>{
         const el = panel.querySelector('.body-part#'+id);
         if(!el) return;
@@ -312,6 +406,7 @@
         if (maxEl) maxEl.value = vals[1];
       });
 
+      // Ekwipunek
       panel.querySelectorAll('.inv').forEach((i,idx)=>{
         if (state.inventory && state.inventory[idx] !== undefined) {
           i.value = state.inventory[idx];
@@ -319,6 +414,40 @@
           i.value = '';
         }
       });
+
+      // Statusy – najpierw czyścimy stare ikonki
+      ['head','torso','left-arm','right-arm','left-leg','right-leg'].forEach(id=>{
+        const el = panel.querySelector('.body-part#'+id);
+        if(!el) return;
+        el.querySelectorAll('.status-icon').forEach(icon=> icon.remove());
+
+        if (!state.statuses || !state.statuses[id]) return;
+        state.statuses[id].forEach(st => {
+          const iconEl = createStatusIcon(st.type, st.desc);
+          el.appendChild(iconEl);
+        });
+      });
+    }
+
+	function createStatusIcon(type, desc){
+      const iconEl = document.createElement('span');
+      iconEl.className = 'status-icon';
+      iconEl.dataset.type = type || 'custom';
+      iconEl.dataset.desc = desc || '';
+      const iconChar = STATUS_ICON[type] || STATUS_ICON.custom;
+      const label = STATUS_LABEL[type] || STATUS_LABEL.custom;
+      iconEl.textContent = iconChar;
+      iconEl.title = desc ? (label + ': ' + desc) : label;
+
+      // kliknięcie usuwa status
+      iconEl.addEventListener('click', () => {
+        const panel = iconEl.closest('.panel');
+        const idx = panel.dataset.idx;
+        iconEl.remove();
+        saveStateWithRole(idx); // zapis + sync
+      });
+
+      return iconEl;
     }
 
     function saveStateFor(idx, options){
@@ -331,6 +460,17 @@
       // wysyłka do Firebase (jeśli ustawiono push)
       if (options.push) {
         db.ref('games/'+gameId+'/characters/'+idx).set(state);
+      }
+    }
+
+	 function saveStateWithRole(idx){
+      if(currentRole === 'gm'){
+        saveStateFor(idx, {push:true});
+      } else if(currentRole === 'player'){
+        // na razie gracz nie pcha statusów do Firebase – tylko lokalnie
+        saveStateFor(idx, {push:false});
+      } else {
+        saveStateFor(idx, {push:false});
       }
     }
 
@@ -643,6 +783,32 @@
       }
 
       applyVisibilityToAll();
+	  
+	   // Obsługa dodawania statusów
+	document.querySelectorAll('.add-status-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panel = btn.closest('.panel');
+        const idx = panel.dataset.idx;
+
+        const partSelect = panel.querySelector('.status-part-select');
+        const typeSelect = panel.querySelector('.status-type-select');
+        const descInput = panel.querySelector('.status-desc-input');
+
+        const partId = partSelect.value;
+        const type = typeSelect.value;
+        const desc = descInput.value.trim();
+
+        const bodyPartEl = panel.querySelector('.body-part#'+partId);
+        if(!bodyPartEl) return;
+
+        const iconEl = createStatusIcon(type, desc);
+        bodyPartEl.appendChild(iconEl);
+
+        descInput.value = '';
+        saveStateWithRole(idx);
+      });
+    });
+	  
     })();
 
     // debug
@@ -650,5 +816,6 @@
   </script>
 </body>
 </html>
+
 
 

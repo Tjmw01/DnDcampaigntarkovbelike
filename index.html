@@ -193,3 +193,459 @@
               <label class="inventory-item">Przedmiot 1: <input type="text" class="inv" /></label>
               <label class="inventory-item">Przedmiot 2: <input type="text" class="inv" /></label>
             </div>
+
+            <div style="margin-top:18px">
+              <button class="btn" data-action="export">Eksportuj (JSON)</button>
+              <button class="btn secondary" data-action="import">Importuj (wklej JSON)</button>
+            </div>
+
+            <div style="margin-top:12px" class="small">
+              Stan zapisuje się lokalnie (localStorage) i online (Firebase) dla tej postaci.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      Klucze lokalnego zapisu: <code>dndTrackerState_1</code>, <code>dndTrackerState_2</code>.<br/>
+      Ustawienia widoczności: <code>games/kampania_1/visibility</code> w Firebase.<br/>
+      Stan postaci: <code>games/kampania_1/characters/1</code>, <code>/2</code>.
+    </footer>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <script>
+    // Twój config
+    const firebaseConfig = { 
+      apiKey: "AIzaSyD9xoh-2YXVMcsNvIlrflClIjXP7xDIwPQ",
+      authDomain: "dnd-realtime-31cc4.firebaseapp.com",
+      projectId: "dnd-realtime-31cc4",
+      storageBucket: "dnd-realtime-31cc4.firebasestorage.app",
+      messagingSenderId: "611606204130",
+      appId: "1:611606204130:web:1fefd2fb662ccd9f7858bb"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const gameId = "kampania_1"; // jeśli chcesz kolejną kampanię, zmień to np. na "kampania_2"
+
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+
+    const roleSelect = $('#roleSelect');
+    const rememberRole = $('#rememberRole');
+    const mgPanel = $('#mgPanel');
+    const tabs = $$('#tabs .tab');
+    const panels = $$('.panel');
+    const connectionStatus = $('#connectionStatus');
+
+    let currentRole = 'unset';
+    let currentPlayerIdx = localStorage.getItem('dndPlayerIndex') || '1';
+    let isApplyingFromServer = false;
+
+    function defaultVisibility(){
+      return {
+        showName:true,
+        showHP:true,
+        showInventory:true,
+        allowPlayerEditHP:false,
+        allowPlayerEditInv:false
+      };
+    }
+
+    let visibility = defaultVisibility();
+
+    function storageKeyFor(idx){ return 'dndTrackerState_' + idx; }
+
+    // Połączenie z Firebase (prosty wskaźnik)
+    (function setupConnectionIndicator(){
+      const connectedRef = db.ref(".info/connected");
+      connectedRef.on("value", snap => {
+        if (snap.val() === true) {
+          connectionStatus.textContent = "Online";
+          connectionStatus.classList.remove("offline");
+          connectionStatus.classList.add("online");
+        } else {
+          connectionStatus.textContent = "Offline";
+          connectionStatus.classList.remove("online");
+          connectionStatus.classList.add("offline");
+        }
+      });
+    })();
+
+    // --- Zbieranie i aplikowanie stanu postaci ---
+
+    function collectStateFromPanel(panel){
+      const state = { name: '', parts:{}, inventory:[] };
+      const nameEl = panel.querySelector('.character-name');
+      state.name = nameEl ? nameEl.value : '';
+
+      ['head','torso','left-arm','right-arm','left-leg','right-leg'].forEach(id=>{
+        const el = panel.querySelector('.body-part#'+id);
+        if(!el) return;
+        const cur = el.querySelector('.hp-cur').value;
+        const max = el.querySelector('.hp-max').value;
+        state.parts[id]=[cur,max];
+      });
+
+      panel.querySelectorAll('.inv').forEach(i=> state.inventory.push(i.value));
+      return state;
+    }
+
+    function applyStateToPanel(panel, state){
+      if(!state) return;
+      const nameEl = panel.querySelector('.character-name');
+      if (nameEl) nameEl.value = state.name || '';
+
+      Object.entries(state.parts || {}).forEach(([id,vals])=>{
+        const el = panel.querySelector('.body-part#'+id);
+        if(!el) return;
+        const curEl = el.querySelector('.hp-cur');
+        const maxEl = el.querySelector('.hp-max');
+        if (curEl) curEl.value = vals[0];
+        if (maxEl) maxEl.value = vals[1];
+      });
+
+      panel.querySelectorAll('.inv').forEach((i,idx)=>{
+        if (state.inventory && state.inventory[idx] !== undefined) {
+          i.value = state.inventory[idx];
+        } else {
+          i.value = '';
+        }
+      });
+    }
+
+    function saveStateFor(idx, options){
+      options = options || {};
+      const panel = document.querySelector('.panel[data-idx="'+idx+'"]');
+      if(!panel) return;
+      const state = collectStateFromPanel(panel);
+      // lokalny backup
+      localStorage.setItem(storageKeyFor(idx), JSON.stringify(state));
+      // wysyłka do Firebase (jeśli ustawiono push)
+      if (options.push) {
+        db.ref('games/'+gameId+'/characters/'+idx).set(state);
+      }
+    }
+
+    function loadStateFromLocal(idx){
+      const panel = document.querySelector('.panel[data-idx="'+idx+'"]');
+      const str = localStorage.getItem(storageKeyFor(idx));
+      if(!panel || !str) return;
+      try {
+        const state = JSON.parse(str);
+        applyStateToPanel(panel, state);
+        updateColorsFor(panel);
+      } catch (e) {
+        console.warn('Błąd loadStateFromLocal', e);
+      }
+    }
+
+    // --- Kolory HP ---
+
+    function updateColorsFor(panel){
+      panel.querySelectorAll('.body-part').forEach(part=>{
+        const cur = parseInt(part.querySelector('.hp-cur').value) || 0;
+        const max = parseInt(part.querySelector('.hp-max').value) || 1;
+        const ratio = cur / max;
+        let color = '#4caf50';
+        if(ratio < 0.75) color = '#ffb74d';
+        if(ratio < 0.25) color = '#f44336';
+        part.style.background = color;
+      });
+    }
+
+    // --- Firebase: subskrypcje ---
+
+    function subscribeToCharacter(idx){
+      const panel = document.querySelector('.panel[data-idx="'+idx+'"]');
+      if(!panel) return;
+      db.ref('games/'+gameId+'/characters/'+idx).on('value', snap => {
+        const state = snap.val();
+        if(!state) return;
+        isApplyingFromServer = true;
+        applyStateToPanel(panel, state);
+        updateColorsFor(panel);
+        isApplyingFromServer = false;
+      });
+    }
+
+    function subscribeToVisibility(){
+      db.ref('games/'+gameId+'/visibility').on('value', snap => {
+        const v = snap.val();
+        if (v) {
+          visibility = Object.assign(defaultVisibility(), v);
+        } else {
+          visibility = defaultVisibility();
+        }
+        applyVisibilityCheckboxes();
+        applyVisibilityToAll();
+      });
+    }
+
+    function pushVisibilityToServer(){
+      db.ref('games/'+gameId+'/visibility').set(visibility);
+    }
+
+    // --- Role & UI ---
+
+    function loadSavedRole(){
+      return localStorage.getItem('dndRole') || 'unset';
+    }
+
+    function saveRole(role, remember){
+      if(remember){
+        localStorage.setItem('dndRole', role);
+      } else {
+        localStorage.removeItem('dndRole');
+      }
+    }
+
+    function askWhichPlayer(){
+      const choice = prompt('Jesteś Graczem — którą postać wybierasz? (1 lub 2)', currentPlayerIdx);
+      const idx = (choice === '2') ? '2' : '1';
+      currentPlayerIdx = idx;
+      localStorage.setItem('dndPlayerIndex', idx);
+      activateTab(idx);
+      applyRoleUI();
+    }
+
+    function applyRoleUI(){
+      currentRole = roleSelect.value;
+
+      if(currentRole === 'gm') {
+        mgPanel.classList.remove('hidden');
+      } else {
+        mgPanel.classList.add('hidden');
+      }
+
+      if(currentRole === 'player'){
+        const playerIdx = currentPlayerIdx || '1';
+        activateTab(playerIdx);
+        tabs.forEach(t => t.classList.toggle('hidden', t.dataset.idx !== playerIdx));
+      } else {
+        tabs.forEach(t => t.classList.remove('hidden'));
+      }
+
+      applyVisibilityToAll();
+    }
+
+    // --- Zakładki ---
+
+    function activateTab(idx){
+      tabs.forEach(t=> t.classList.toggle('active', t.dataset.idx === String(idx)));
+      panels.forEach(p=> p.style.display = (p.dataset.idx === String(idx)) ? 'block' : 'none');
+      // lokalny backup (na starcie) – potem i tak nadpisze Firebase
+      loadStateFromLocal(idx);
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        activateTab(tab.dataset.idx);
+      });
+    });
+
+    // --- Widoczność / uprawnienia ---
+
+    function applyVisibilityCheckboxes(){
+      // tylko MG widzi checkboxy, ale logika i tak działa dla wszystkich
+      const visName = $('#vis_name');
+      const visHp = $('#vis_hp');
+      const visInv = $('#vis_inventory');
+      const allowHp = $('#allow_player_edit_hp');
+      const allowInv = $('#allow_player_edit_inv');
+      if (!visName) return;
+
+      visName.checked = visibility.showName;
+      visHp.checked = visibility.showHP;
+      visInv.checked = visibility.showInventory;
+      allowHp.checked = visibility.allowPlayerEditHP;
+      allowInv.checked = visibility.allowPlayerEditInv;
+    }
+
+    function applyVisibilityToPanel(panel){
+      const v = visibility;
+
+      // Imię
+      const nameEl = panel.querySelector('.character-name');
+      if(nameEl){
+        nameEl.style.display = v.showName ? 'block' : 'none';
+      }
+
+      // Ekwipunek
+      panel.querySelectorAll('.inv').forEach(i=>{
+        const wrapper = i.closest('.inventory-item');
+        if(wrapper) wrapper.style.display = v.showInventory ? 'block' : 'none';
+      });
+
+      // HP (same cyferki, label zostaje)
+      panel.querySelectorAll('.body-part').forEach(bp=>{
+        bp.querySelectorAll('input').forEach(inp=>{
+          inp.style.display = v.showHP ? 'inline-block' : 'none';
+        });
+      });
+
+      // readonly dla gracza
+      if(currentRole === 'player'){
+        const playerIdx = currentPlayerIdx || '1';
+        if(panel.dataset.idx !== playerIdx) return;
+        panel.querySelectorAll('.hp-cur, .hp-max').forEach(i=> i.readOnly = !v.allowPlayerEditHP);
+        panel.querySelectorAll('.inv').forEach(i=> i.readOnly = !v.allowPlayerEditInv);
+      } else {
+        panel.querySelectorAll('.hp-cur, .hp-max').forEach(i=> i.readOnly = false);
+        panel.querySelectorAll('.inv').forEach(i=> i.readOnly = false);
+      }
+    }
+
+    function applyVisibilityToAll(){
+      panels.forEach(panel => applyVisibilityToPanel(panel));
+    }
+
+    // --- Zdarzenia ---
+
+    // input -> zapis / sync
+    document.addEventListener('input', e=>{
+      const panel = e.target.closest('.panel');
+      if(!panel) return;
+      const idx = panel.dataset.idx;
+      updateColorsFor(panel);
+
+      if(isApplyingFromServer) return; // nie echo’ujemy zmian z Firebase
+
+      const role = currentRole;
+      const v = visibility;
+      const isHpInput = e.target.classList.contains('hp-cur') || e.target.classList.contains('hp-max');
+      const isInvInput = e.target.classList.contains('inv');
+
+      if(role === 'gm'){
+        // MG zawsze pcha do Firebase
+        saveStateFor(idx, {push:true});
+      } else if(role === 'player'){
+        let canPush = false;
+        if(isHpInput && v.allowPlayerEditHP) canPush = true;
+        if(isInvInput && v.allowPlayerEditInv) canPush = true;
+        saveStateFor(idx, {push:canPush});
+      } else {
+        // Nie wybrano roli – tylko lokalny zapis
+        saveStateFor(idx, {push:false});
+      }
+    });
+
+    // Eksport / import JSON
+    document.querySelectorAll('[data-action="export"]').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        const panel = e.target.closest('.panel');
+        const idx = panel.dataset.idx;
+        const str = localStorage.getItem(storageKeyFor(idx)) || '{}';
+        prompt('Skopiuj JSON (export):', str);
+      });
+    });
+
+    document.querySelectorAll('[data-action="import"]').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        const panel = e.target.closest('.panel');
+        const idx = panel.dataset.idx;
+        const txt = prompt('Wklej JSON do importu:');
+        if(!txt) return;
+        try{
+          const state = JSON.parse(txt);
+          // lokalnie
+          localStorage.setItem(storageKeyFor(idx), txt);
+          // do Firebase
+          db.ref('games/'+gameId+'/characters/'+idx).set(state);
+          // i od razu aplikujemy
+          isApplyingFromServer = true;
+          applyStateToPanel(panel, state);
+          updateColorsFor(panel);
+          isApplyingFromServer = false;
+          alert('Zaimportowano');
+        }catch(err){
+          alert('Błąd JSON: '+err.message);
+        }
+      });
+    });
+
+    // Ustawienia MG -> checkboxy visibility
+    ['vis_name','vis_hp','vis_inventory','allow_player_edit_hp','allow_player_edit_inv'].forEach(id=>{
+      const el = $('#'+id);
+      if(!el) return;
+      el.addEventListener('change', ()=>{
+        visibility.showName = $('#vis_name').checked;
+        visibility.showHP = $('#vis_hp').checked;
+        visibility.showInventory = $('#vis_inventory').checked;
+        visibility.allowPlayerEditHP = $('#allow_player_edit_hp').checked;
+        visibility.allowPlayerEditInv = $('#allow_player_edit_inv').checked;
+        pushVisibilityToServer();
+        applyVisibilityToAll();
+      });
+    });
+
+    // Przycisk "Ustawienia MG" – szybki switch do MG
+    $('#openRoleSettings').addEventListener('click', ()=>{
+      roleSelect.value = 'gm';
+      rememberRole.checked = false;
+      saveRole('gm', false);
+      applyRoleUI();
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+
+    // Zmiana roli
+    roleSelect.addEventListener('change', e=>{
+      const r = e.target.value;
+      if(rememberRole.checked) saveRole(r, true);
+      currentRole = r;
+      if(r === 'player'){
+        askWhichPlayer();
+      } else {
+        applyRoleUI();
+      }
+    });
+
+    rememberRole.addEventListener('change', ()=>{
+      if(rememberRole.checked){
+        saveRole(roleSelect.value, true);
+      } else {
+        saveRole('unset', false);
+      }
+    });
+
+    // --- Init ---
+
+    (function init(){
+      // role & player index
+      const savedRole = loadSavedRole();
+      if(savedRole && savedRole !== 'unset'){
+        roleSelect.value = savedRole;
+        rememberRole.checked = true;
+        currentRole = savedRole;
+      }
+      currentPlayerIdx = localStorage.getItem('dndPlayerIndex') || currentPlayerIdx;
+
+      // zakładki
+      activateTab(currentPlayerIdx || '1');
+
+      // Firebase subskrypcje
+      subscribeToVisibility();
+      subscribeToCharacter(1);
+      subscribeToCharacter(2);
+
+      // po ustaleniu roli
+      if(currentRole === 'player'){
+        askWhichPlayer();
+      } else {
+        applyRoleUI();
+      }
+
+      applyVisibilityToAll();
+    })();
+
+    // debug
+    window._dnd = { collectStateFromPanel, applyStateToPanel, visibility };
+  </script>
+</body>
+</html>
